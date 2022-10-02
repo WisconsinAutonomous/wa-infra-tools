@@ -75,10 +75,8 @@ class SSHTunnel:
     @param remote_host - host we want to tunnel to within the remote server
     @param remote_port - port of the remote host we want to tunnel to 
     """
-    def __init__(self, username, local_port, hostname='best-tux.cae.wisc.edu', remote_host='localhost', remote_port=22):
-        self.transport = paramiko.Transport(hostname)
-        self.transport.connect(username=username)
-        self.transport.auth_interactive_dumb(username)
+    def __init__(self, transport, local_port, remote_host, remote_port=22):
+        self.transport = transport
 
         # initialize the fields of the handler using this subhandler class (we need to pass a class name into the forward server)
         class SubHandler(Handler):
@@ -87,6 +85,7 @@ class SSHTunnel:
             transport = self.transport
 
         self.forward_server = ForwardServer(("", local_port), SubHandler)
+        self.is_active = False
 
     def _serve_forever_wrap(self, server):
         """ Wraps the serve_forever function to be run in a thread """
@@ -94,16 +93,72 @@ class SSHTunnel:
 
     def start(self):
         """ Start the tunnel """
-        thread = threading.Thread(
-            target=self._serve_forever_wrap,
-            args=(self.forward_server,),
-            name='server'
-        )
-        
-        thread.daemon = True
-        thread.start()
+        if not self.is_active:
+            thread = threading.Thread(
+                target=self._serve_forever_wrap,
+                args=(self.forward_server,),
+                name='server'
+            )
+            
+            self.is_active = True
+            thread.daemon = True
+            thread.start()
 
     def stop(self):
         """ Kill the tunnel """
-        self.forward_server.shutdown()
-        self.forward_server.server_close()
+        if self.is_active:
+            self.forward_server.shutdown()
+            self.forward_server.server_close()
+            self.is_active = False
+
+class SSHClient:
+    def __init__(self, username, hostname):
+        self.transport = paramiko.Transport(hostname)
+        self.transport.connect(username=username)
+        self.transport.auth_interactive_dumb(username)
+
+        # create dict for forward servers
+        self.forward_servers = {}
+
+    def exec_command(self, command):
+        channel = self.transport.open_session()
+        channel.exec_command(command)
+        stdin = channel.makefile_stdin("wb", -1) 
+        stdout = channel.makefile("r", -1) 
+        stderr = channel.makefile_stderr("r", -1) 
+        return stdin, stdout, stderr
+
+    def createSFTPClient(self):
+        return paramiko.SFTPClient.from_transport(self.transport)
+
+    def start_tunnels(self):
+        # start all tunnels
+        for tunnel in self.forward_servers.values():
+            tunnel.start()
+
+    def stop_tunnels(self):
+        # stop all tunnels
+        for tunnel in self.forward_servers.values():
+            tunnel.stop()
+
+    def start_tunnel(self, local_port, remote_host, remote_port):
+        if (local_port, remote_host, remote_port) not in self.forward_servers:
+            self._create_tunnel(local_port, remote_host, remote_port)
+        self.forward_servers[(local_port, remote_host, remote_port)].start()
+
+    def stop_tunnel(self, local_port, remote_host, remote_port):
+        if (local_port, remote_host, remote_port) in self.forward_servers:
+            self.forward_servers[(local_port, remote_host, remote_port)].stop()
+
+    def remove_tunnel(self, local_port, remote_host, remote_port):
+        # stop tunnel, then remove from dict
+        self.stop_tunnel(local_port, remote_host, remote_port)
+        del self.forward_servers[(local_port, remote_host, remote_port)]
+
+    def _create_tunnel(self, local_port, remote_host, remote_port):
+        self.forward_servers[(local_port, remote_host, remote_port)] = SSHTunnel(self.transport, local_port, remote_host, remote_port)
+
+    @property
+    def tunnels(self):
+        return list(self.forward_servers.keys())
+
