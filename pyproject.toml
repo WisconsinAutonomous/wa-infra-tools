@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "scp", "paramiko", "psycopg2-binary"]
+requires = ["setuptools>=61.0", "paramiko", "psycopg2-binary"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -18,4 +18,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Github" = "https://github.com/brian-hu/wa_infra_tools"
+"Github" = "https://github.com/brian-hu/wa-infra-tools"

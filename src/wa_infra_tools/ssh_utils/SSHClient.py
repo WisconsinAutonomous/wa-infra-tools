@@ -120,6 +120,9 @@ class SSHClient:
         # create dict for forward servers
         self.forward_servers = {}
 
+        # create sftp client
+        self.sftp_client = paramiko.SFTPClient.from_transport(self.transport)
+
     def exec_command(self, command):
         channel = self.transport.open_session()
         channel.exec_command(command)
@@ -128,8 +131,8 @@ class SSHClient:
         stderr = channel.makefile_stderr("r", -1) 
         return stdin, stdout, stderr
 
-    def createSFTPClient(self):
-        return paramiko.SFTPClient.from_transport(self.transport)
+    def getSFTPClient(self):
+        return self.sftp_client
 
     def start_tunnels(self):
         # start all tunnels
