@@ -228,19 +228,15 @@ class PostgresDatabase:
         if not os.path.exists(output_path + "labels"):
             os.mkdir(output_path + "labels")
 
-        i = 0
+        print("Downloading images")
         for image_id_val, path in image_remote_filepaths.items():
-            print("images", i, "/", len(image_remote_filepaths))
             image_extension = "." + path.split(".")[-1]
             self._download_image(output_path + "images/" + str(image_id_val) + image_extension, path)
-            i += 1
 
-        i = 0
+        print("Writing labels")
         for image_id_val, label_str in label_dict.items():
-            print("labels", i, "/", len(label_dict))
             with open(output_path + "labels/" + str(image_id_val) + ".txt", "w") as f:
                 f.write(label_str)
-            i += 1
 
     def _check_schema(self, table_name, value_dict):
         """
