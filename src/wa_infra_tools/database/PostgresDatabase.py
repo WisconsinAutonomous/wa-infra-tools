@@ -88,7 +88,7 @@ class PostgresDatabase:
 
     def insert_row(self, table_name, value_dict):
         """
-        Insert row into the database
+        Insert row into the database. Does not commit the insertion into the database until commit is called
         Note: This function will NOT prepare to send any images you want to insert
         upon commiting the transaction
 
@@ -115,7 +115,8 @@ class PostgresDatabase:
 
     def insert_row_with_image(self, table_name, value_dict, image_id_col="image_id"):
         """
-        Insert row into the database with image
+        Insert row into the database with image. Does not commit the insertion into the database or send the 
+        image until commit is called
 
         @param table_name : str             - table to insert into
         @param value_dict : Dict[str, any]  - dictionary of column name, value pairs to insert
