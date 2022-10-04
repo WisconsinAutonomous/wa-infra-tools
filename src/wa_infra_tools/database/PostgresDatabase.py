@@ -267,7 +267,7 @@ class PostgresDatabase:
         @remote_filepath : str  - where to store image on remote machine
         @remote_filename : str  - what to call file on remote machine
         """
-        sftp = self.client.getSFTPClient()
+        sftp = self.client.get_sftp_client()
         self.client.exec_command(f"mkdir -p '{remote_filepath}'")
         while True:
             try:
@@ -283,7 +283,7 @@ class PostgresDatabase:
         @local_filepath : str   - where to store image on local machine
         @remote_filepath : str  - path to image on remote machine
         """
-        sftp = self.client.getSFTPClient()
+        sftp = self.client.get_sftp_client()
         sftp.stat(remote_filepath)
         while True:
             try:

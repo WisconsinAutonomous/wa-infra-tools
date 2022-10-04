@@ -131,7 +131,7 @@ class SSHClient:
         stderr = channel.makefile_stderr("r", -1) 
         return stdin, stdout, stderr
 
-    def getSFTPClient(self):
+    def get_sftp_client(self):
         return self.sftp_client
 
     def start_tunnels(self):
@@ -146,7 +146,7 @@ class SSHClient:
 
     def start_tunnel(self, local_port, remote_host, remote_port):
         if (local_port, remote_host, remote_port) not in self.forward_servers:
-            self._create_tunnel(local_port, remote_host, remote_port)
+            self.create_tunnel(local_port, remote_host, remote_port)
         self.forward_servers[(local_port, remote_host, remote_port)].start()
 
     def stop_tunnel(self, local_port, remote_host, remote_port):
@@ -158,7 +158,7 @@ class SSHClient:
         self.stop_tunnel(local_port, remote_host, remote_port)
         del self.forward_servers[(local_port, remote_host, remote_port)]
 
-    def _create_tunnel(self, local_port, remote_host, remote_port):
+    def create_tunnel(self, local_port, remote_host, remote_port):
         self.forward_servers[(local_port, remote_host, remote_port)] = SSHTunnel(self.transport, local_port, remote_host, remote_port)
 
     @property
