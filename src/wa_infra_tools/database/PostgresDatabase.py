@@ -6,11 +6,12 @@ import psycopg2
 import os
 import time
 import hashlib
+from tqdm import tqdm 
 from collections import defaultdict
 from wa_infra_tools.ssh_utils.SSHClient import SSHClient
 
 class PostgresDatabase:
-    def __init__(self, cae_username, dbname='wa', db_username='wa_admin', db_password='wa', hostname='tux-133.cae.wisc.edu', local_port=1234, remote_port=5432):
+    def __init__(self, cae_username, hostname, dbname='wa', db_username='wa_admin', db_password='wa', local_port=1234, remote_port=5432):
         """
         Constructs a PostgresDatabase object by setting up SSH tunnel
         Note: the database runs on tux-133.cae.wisc.edu so hostname must be that machine (for now)
@@ -53,8 +54,11 @@ class PostgresDatabase:
         the database to the remote machine
         """
         self.connection.commit()
-        for (local_filepath, remote_filepath, remote_filename) in self.uncomitted_image_paths:
-            self._upload_image(local_filepath, remote_filepath, remote_filename)
+        if self.uncomitted_image_paths:
+            print("Uploading images")
+            for i in tqdm(range(len(self.uncomitted_image_paths))):
+                local_filepath, remote_filepath, remote_filename  = self.uncomitted_image_paths[i]
+                self._upload_image(local_filepath, remote_filepath, remote_filename)
         self.uncomitted_image_paths = []
 
     def get_schema(self, table_name):
@@ -230,12 +234,16 @@ class PostgresDatabase:
             os.mkdir(output_path + "labels")
 
         print("Downloading images")
-        for image_id_val, path in image_remote_filepaths.items():
+        image_remote_filepaths = list(image_remote_filepaths.items())
+        for i in tqdm(range(len(image_remote_filepaths))):
+            image_id_val, path = image_remote_filepaths[i]
             image_extension = "." + path.split(".")[-1]
             self._download_image(output_path + "images/" + str(image_id_val) + image_extension, path)
 
         print("Writing labels")
-        for image_id_val, label_str in label_dict.items():
+        labels = list(label_dict.items())
+        for i in tqdm(range(len(labels))):
+            image_id_val, label_str = labels[i]
             with open(output_path + "labels/" + str(image_id_val) + ".txt", "w") as f:
                 f.write(label_str)
 

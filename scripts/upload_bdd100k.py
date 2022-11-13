@@ -1,4 +1,5 @@
 from wa_infra_tools.database.PostgresDatabase import PostgresDatabase
+from tqdm import tqdm
 import json
 
 db = PostgresDatabase("bhu49")
@@ -12,13 +13,10 @@ IMAGE_HEIGHT = 720
 with open(labels_path) as f:
     labels = json.load(f)
 
-for i in range(len(labels)):
+for i in tqdm(range(len(labels))):
     image_label = labels[i]
     if "labels" not in image_label.keys():
         continue
-
-    if i % 1000 == 0 or i > 69000:
-        print(f"{i}/{len(labels)}")
 
     image_dict = {
         "x_res": IMAGE_WIDTH,
@@ -35,7 +33,7 @@ for i in range(len(labels)):
         'bus': 1,
         'motor': 1,
         'traffic light': 2,
-        'traffic sign': 2
+        'traffic sign': 3
     }
     for annotation in annotations:
         category = annotation["category"]
@@ -61,7 +59,8 @@ for i in range(len(labels)):
             "center_norm_y": y_center_norm,
             "width_norm": width_norm,
             "height_norm": height_norm,
-            "image_id": image_id
+            "image_id": image_id,
+            "dataset": "bdd100k"
         }
         db.insert_row("bb_labels", label_dict)
 
