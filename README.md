@@ -75,3 +75,6 @@ client.stop_tunnels()
 # see what tunnels exist
 tunnels = client.tunnels
 ```
+
+#### Starting the Database
+Since we don't currently have sudo access on the CAE servers, we have to start the database on each machine manually. If the machine restarts, we also have to restart the database manually. Currently, we are using `tux-144.cae.wisc.edu` to host our database. I have written a script under scripts/start_database.py to start the database. You can run it with `python3 scripts/start_database.py your_username --hostname optional_hostname_if_needed`.
