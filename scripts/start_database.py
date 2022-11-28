@@ -10,8 +10,6 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     client = SSHClient(args.username, args.hostname)
-    stdin, stdout, stderr = client.exec_command("cd /groupspace/studentorgs/wiautonomous/pgsql;bin/pg_ctl start -D data -l logs/serverlog")
-    print("STDOUT:\n")
+    stdin, stdout, stderr = client.exec_command("cd /groupspace/studentorgs/wiautonomous/pgsql;chmod 0750 data;bin/pg_ctl start -D data -l logs/serverlog;tail logs/serverlog")
+    print("Logs:\n")
     print("\n".join(stdout.readlines()))
-    print("STDERR:\n")
-    print("\n".join(stderr.readlines()))
