@@ -10,8 +10,16 @@ In the future, we aim to continue improving on the database api by improving per
 ### Install
 You can install the package locally by running `pip install .` in the root directory.
 ### Components and Examples
-We have two main classes in the package right now, PostgresDatabase and SSHClient. SSHClient was built to support PostgresDatabase and manage the SSH connection to the CAE machine/port forwarding, but it can also be used independently for other projects that require SSH utility.
+- wa-mars CLI
+- wa-git CLI
+- PostgresDatabase
+- SSHUtils
+#### wa-mars
+wa-mars is a CLI that allows the user to easily interface with our Model and Rosbag Storage (MARS) repository. Run `wa-mars -h` for more info on how to use it.
+#### wa-git
+wa-mars is a CLI that wraps git and prevents the user from downloading LFS files (only pointers). Run `wa-git -h` for more info on how to use it.
 #### PostgresDatabase
+PostgresDatabase interfaces with the database in the CAE storage.
 ```python3
 from wa_infra_tools.database import PostgresDatabase
 
@@ -45,6 +53,7 @@ db.join_and_download_data('images_table_name', 'labels_table_name', ['label_col_
 ```
 
 #### SSHClient
+SSHClient can create and manage ssh tunnels. It was made to support PostgresDatabase but can also be used independently.
 ```python3
 from wa_infra_tools.ssh_utils import SSHClient
 
