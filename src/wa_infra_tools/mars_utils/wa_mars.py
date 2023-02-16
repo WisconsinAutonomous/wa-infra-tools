@@ -66,7 +66,12 @@ def parse_args():
     record_rosbag_parser.add_argument("topics", nargs="*", help="list of topics to record")
     record_rosbag_parser.add_argument("-u", "--upload", action="store_true", help="upload rosbag to MARS (only done if output dir (rosbag name) is specified)")
     record_rosbag_parser.add_argument("-o", "--output", type=str, help="name of the directory to save the rosbag into")
-    record_rosbag_parser.set_defaults(func=lambda args:mars_utils.rosbags.record_rosbag(args.topics, args.upload, args.output))
+    record_rosbag_parser.add_argument("--mars-dir", type=str, help="where the MARS repo is (default: crate a temporary MARS repo)")
+    record_rosbag_parser.add_argument("-b", "--branch", type=str, help="which MARS branch to upload to")
+    record_rosbag_parser.add_argument("-m", "--message", type=str, help="commit message")
+    record_rosbag_parser.add_argument("--no-commit", action="store_false", help="do not commit changes")
+    record_rosbag_parser.add_argument("--no-push", action="store_false", help="do not push changes")
+    record_rosbag_parser.set_defaults(func=lambda args:mars_utils.rosbags.record_rosbag(args.topics, args.upload, args.output, args.mars_dir, args.branch, args.message, args.no_commit, args.no_push))
 
     upload_rosbag_parser = rosbag_subparsers.add_parser(
             "upload",

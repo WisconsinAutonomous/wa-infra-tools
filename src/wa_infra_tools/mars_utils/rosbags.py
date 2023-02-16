@@ -1,18 +1,23 @@
 from wa_infra_tools.mars_utils import clone_mars, download, upload, remove
 import subprocess
 
-def record_rosbag(topics=None, upload=False, output_dir=None):
+def record_rosbag(topics=None, upload=False, output_dir=None, mars_dir=None, branch=None, commit_message=None, commit_changes=True, push_changes=True):
     command = ["ros2", "bag", "record"]
     if output_dir:
-        command.append(f"-o {output_dir}")
+        command += ["-o", output_dir]
 
     if topics:
         command += topics
     else:
         command.append("-a")
-    subprocess.run(command)
+
+    try:
+        subprocess.run(command)
+    except KeyboardInterrupt:
+        print("finished recording rosbag")
+
     if upload and output_dir is not None:
-        upload_rosbag(output_dir, output_dir)
+        upload_rosbag(output_dir, output_dir, mars_dir, branch, commit_message, commit_changes, push_changes)
 
 def upload_rosbag(rosbag_name, rosbag_dir, mars_dir=None, branch=None, commit_message=None, commit_changes=True, push_changes=True):
     upload_path = "rosbags/" + rosbag_name
