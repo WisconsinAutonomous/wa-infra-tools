@@ -51,6 +51,14 @@ def parse_args():
     remove_model_parser.add_argument("--no-push", action="store_false", help="do not push changes")
     remove_model_parser.set_defaults(func=lambda args: mars_utils.models.remove_model(args.model_name, args.category, args.mars_dir, args.branch, args.message, args.no_commit, args.no_push))
 
+    list_models_parser = model_subparsers.add_parser(
+            "list",
+            description="wa_mars model list parser",
+            help="list models in MARS")
+    list_models_parser.add_argument("-c", "--categories", nargs="*", help="category of models you want listed (default: list all categories)")
+    list_models_parser.add_argument("--mars-dir", type=str, help="where the MARS repo is (default: crate a temporary MARS repo)")
+    list_models_parser.add_argument("-b", "--branch", type=str, help="which branch of MARS to check out")
+    list_models_parser.set_defaults(func=lambda args: mars_utils.models.list_models(args.categories, args.mars_dir, args.branch))
 
     # rosbags
     rosbag_parser = subparsers.add_parser(
@@ -108,6 +116,14 @@ def parse_args():
     remove_rosbag_parser.add_argument("--no-commit", action="store_false", help="do not commit changes")
     remove_rosbag_parser.add_argument("--no-push", action="store_false", help="do not push changes")
     remove_rosbag_parser.set_defaults(func=lambda args: mars_utils.rosbags.remove_rosbag(args.rosbag_name, args.category, args.mars_dir, args.branch, args.message, args.no_commit, args.no_push))
+
+    list_rosbags_parser = rosbag_subparsers.add_parser(
+            "list",
+            description="wa_mars rosbag list parser",
+            help="list rosbags in MARS")
+    list_rosbags_parser.add_argument("--mars-dir", type=str, help="where the MARS repo is (default: crate a temporary MARS repo)")
+    list_rosbags_parser.add_argument("-b", "--branch", type=str, help="which branch of MARS to check out")
+    list_rosbags_parser.set_defaults(func=lambda args: mars_utils.rosbags.list_rosbags(args.mars_dir, args.branch))
 
     args = parent_parser.parse_args()
     return args

@@ -1,4 +1,4 @@
-from wa_infra_tools.mars_utils import clone_mars, download, upload, remove
+from wa_infra_tools.mars_utils import clone_mars, download, upload, remove, list_files
 import subprocess
 
 def record_rosbag(topics=None, upload=False, output_dir=None, mars_dir=None, branch=None, commit_message=None, commit_changes=True, push_changes=True):
@@ -33,3 +33,7 @@ def remove_rosbag(rosbag_name, mars_dir=None, branch=None, commit_message=None, 
     if commit_message is None:
         commit_message = "Removed rosbag {rosbag_name}"
     remove(del_path, mars_dir, branch, commit_message, commit_changes, push_changes)
+
+def list_rosbags(mars_dir=None, branch=None):
+    for rosbag in list_files("rosbags", mars_dir, branch):
+        print(rosbag)

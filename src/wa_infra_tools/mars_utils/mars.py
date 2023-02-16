@@ -2,15 +2,15 @@ from wa_infra_tools import git_utils
 from distutils.dir_util import copy_tree, remove_tree
 import os
 
-def clone_mars(branch=None, mars_dir=None):
+def clone_mars(branch=None, mars_dir=None, capture_output=True):
     try:
-        git_utils.clone("git@github.com:WisconsinAutonomous/MARS.git", branch, mars_dir)
+        git_utils.clone("git@github.com:WisconsinAutonomous/MARS.git", branch, mars_dir, capture_output)
         return
     except:
         print("ssh clone of MARS failed")
 
     try:
-        git_utils.clone("https://github.com/WisconsinAutonomous/MARS.git", branch, mars_dir)
+        git_utils.clone("https://github.com/WisconsinAutonomous/MARS.git", branch, mars_dir, capture_output)
         return
     except:
         print("https clone of MARS failed")
@@ -73,3 +73,18 @@ def remove(local_path, mars_dir=None, branch=None, commit_message=None, commit_c
     if del_mars:
         remove_tree(mars_dir)
 
+def list_files(local_path, mars_dir=None, branch=None):
+    del_mars = False # delete mars repo after operation
+    if mars_dir is None: # create temporary repo
+        clone_mars(branch=branch)
+        mars_dir = "MARS"
+        del_mars = True
+
+    # create list of files in directory
+    files = os.listdir(mars_dir + "/" + local_path)
+
+    # delete temp repo
+    if del_mars:
+        remove_tree(mars_dir)
+
+    return files

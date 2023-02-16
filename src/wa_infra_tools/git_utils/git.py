@@ -3,14 +3,14 @@ import re
 import os
 from tqdm import tqdm
 
-def clone(git_url, branch=None, repo_dir=None):
+def clone(git_url, branch=None, repo_dir=None, capture_output=True):
     os.environ["GIT_LFS_SKIP_SMUDGE"] = "1"
     if repo_dir is None:
         repo_dir = re.split(r"/|\.", git_url)[-2]
     commands = ["git", "clone", git_url, "-o", repo_dir]
     if branch is not None:
         commands += ["-b", branch]
-    subprocess.run(commands)
+    subprocess.run(commands, capture_output=capture_output)
     os.environ["GIT_LFS_SKIP_SMUDGE"] = "0"
 
 def pull(repo_dir, capture_output=True):
