@@ -103,7 +103,7 @@ def parse_args():
     download_rosbag_parser.add_argument("output_dir", type=str, help="where to save the rosbag")
     download_rosbag_parser.add_argument("--mars-dir", type=str, help="where the MARS repo is (default: crate a temporary MARS repo)")
     download_rosbag_parser.add_argument("-b", "--branch", type=str, help="which branch of MARS to check out")
-    download_rosbag_parser.set_defaults(func=lambda args: mars_utils.rosbags.download_rosbag(args.rosbag_name, args.category, args.output_dir, args.mars_dir, args.branch))
+    download_rosbag_parser.set_defaults(func=lambda args: mars_utils.rosbags.download_rosbag(args.rosbag_name, args.output_dir, args.mars_dir, args.branch))
 
     remove_rosbag_parser = rosbag_subparsers.add_parser(
             "remove",
