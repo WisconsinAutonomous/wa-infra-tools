@@ -132,21 +132,25 @@ class PostgresDatabase:
         local_filepath = value_dict["filepath"]
         assert os.path.isfile(local_filepath), f"The path {local_filepath} to the image is invalid"
 
-        # get image_id of the row we are going to insert
+        # insert row without filepath
+        value_dict["filepath"] = "'temp'"
+        self.insert_row(table_name, value_dict)
+
+        # get image_id of the row
         image_id = self.sql(f"SELECT max({image_id_col}) FROM {table_name}")[0][0] or 0
-        image_id += 1
         hash_val = str(hashlib.md5(repr(image_id).encode()).hexdigest())
 
         # generate filepath for the image to be stored
-        image_extension = "." + value_dict["filepath"].split(".")[-1]
+        image_extension = "." + local_filepath.split(".")[-1]
         cae_filepath = f"/groupspace/studentorgs/wiautonomous/pgsql/{table_name}/"
         for i in range(0, 26, 2): # md5 hashes are 32 hex digits long, we only want part of it to create the filepath
             cae_filepath += hash_val[i] + hash_val[i + 1] + "/"
         cae_filename = hash_val[26:] + image_extension
 
-        # insert row into the database
-        value_dict["filepath"] = "'" + cae_filepath + cae_filename + "'"
-        self.insert_row(table_name, value_dict)
+        # update row with correct filepath
+        self.sql(f"UPDATE {table_name} SET filepath = '{cae_filepath}{cae_filename}' WHERE image_id = {image_id}")
+
+        # prepare to upload image later
         self.uncomitted_image_paths.append((local_filepath, cae_filepath, cae_filename))
 
         return image_id 

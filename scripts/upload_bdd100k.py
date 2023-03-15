@@ -2,10 +2,10 @@ from wa_infra_tools.database.PostgresDatabase import PostgresDatabase
 from tqdm import tqdm
 import json
 
-db = PostgresDatabase("bhu49")
+db = PostgresDatabase("bhu49", "tux-144.cae.wisc.edu")
 
-images_path = "../../bdd100k/images/100k/train/"
-labels_path = "../../bdd100k/labels/bdd100k_labels_images_train.json"
+images_path = "../bdd100k/images/10k/train/"
+labels_path = "../bdd100k/labels/bdd100k_labels_images_val.json"
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
@@ -23,7 +23,7 @@ for i in tqdm(range(len(labels))):
         "y_res": IMAGE_HEIGHT,
         "filepath": images_path + image_label["name"]
     }
-    image_id = db.insert_row_with_image("images", image_dict)
+    image_id = db.insert_row_with_image("test_images", image_dict)
 
     annotations = image_label["labels"]
     class_id_map = {
@@ -62,6 +62,6 @@ for i in tqdm(range(len(labels))):
             "image_id": image_id,
             "dataset": "bdd100k"
         }
-        db.insert_row("bb_labels", label_dict)
+        db.insert_row("test_bb_labels", label_dict)
 
 db.commit()
