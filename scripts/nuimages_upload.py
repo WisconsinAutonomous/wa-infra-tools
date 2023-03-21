@@ -43,7 +43,6 @@ y_center_norm = "not found"
 width_norm = "not found"
 height_norm = "not found"
 image_id = "not found"
-count = 0
 
 for image in image_list:
     if(labels_dict.get("samples/CAM_FRONT/" + image) != None):
@@ -101,13 +100,6 @@ for image in image_list:
                     "image_id": image_id,
                     "dataset" : "nuimages"
                     }
-                new_row = pd.DataFrame(label_dict, index = [0])
-                #df = pd.concat([df,new_row], ignore_index = True)
-                # print(new_row)
                 db.insert_row("bb_labels", label_dict)
-    count+=1
-    print(new_row)
-    print("Progress: " + str((count/total)*100) + "% Done")
-
-#print("dataframe:" + df)
+    
 db.commit()
