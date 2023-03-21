@@ -281,7 +281,8 @@ class PostgresDatabase:
             try:
                 sftp.put(local_filepath, remote_filepath + remote_filename)
                 break
-            except:
+            except Exception as e:
+                print(e)
                 time.sleep(0.1)
 
     def _download_image(self, local_filepath, remote_filepath):
